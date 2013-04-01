@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class MinimizerTest extends BaseTest {
@@ -102,6 +103,7 @@ public class MinimizerTest extends BaseTest {
     }
     
     @Test
+    @Ignore
     public void testProcessWithMinimizeEnabled() {
         // normal js case
         jm.enableDisableMinimize(true);
