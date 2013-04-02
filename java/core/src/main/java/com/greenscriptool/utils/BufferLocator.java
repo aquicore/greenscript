@@ -14,7 +14,7 @@ public class BufferLocator implements IBufferLocator {
     }
     
     @Override
-    public BufferResource newBuffer(List<String> resourceNames, String extension) {
+    public BufferResource newBuffer(String resourceName, String extension) {
         String key = UUID.randomUUID().toString() + extension;
         BufferResource buffer = new BufferResource(key);
         this.buffers.put(key, buffer);

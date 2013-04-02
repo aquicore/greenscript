@@ -48,7 +48,7 @@ public class BufferResource implements IResource, Serializable {
     public String getKey() {
         return key_;
     }
-    
+
     public static void main(String[] args) throws Exception {
         BufferResource br = new BufferResource("key");
         Writer w = br.getWriter();

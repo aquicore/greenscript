@@ -749,18 +749,9 @@ public class GreenScriptPlugin extends PlayPlugin {
             return Cache.get(key_(key), BufferResource.class);
         }
         @Override
-        public BufferResource newBuffer(List<String> resourceNames, String extension) {
-        	StringBuilder builder = new StringBuilder();
-        	for (String resourceName : resourceNames) {
-        		builder.append(resourceName);
-			}
-
-            String key = UUID.nameUUIDFromBytes(builder.toString().getBytes()).toString() + extension;
-
-            Logger.trace("Created key '%s' from resources '%s' and extension '%s'", key, builder.toString(), extension);
-
-            BufferResource buffer = new BufferResource(key);
-            Cache.set(key_(key), buffer);
+        public BufferResource newBuffer(String resourceName, String extension) {
+            BufferResource buffer = new BufferResource(resourceName + extension);
+            Cache.set(key_(resourceName + extension), buffer);
             return buffer;
         }
     };

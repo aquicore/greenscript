@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Logger;
@@ -527,8 +528,7 @@ public class Minimizer implements IMinimizer {
     }
 
     private IResource minimize(List<String> resourceNames) {
-        IResource rsrc = newCache_(resourceNames);
-        Writer out = rsrc.getWriter();
+        Writer out = new StringWriter();
         StringWriter sw = new StringWriter();
         try {
             for (String s : resourceNames) {
@@ -564,19 +564,15 @@ public class Minimizer implements IMinimizer {
             } else {
                 copy_(s, out);
             }
+            String content = out.toString();
+            IResource rsrc = newCache_(UUID.nameUUIDFromBytes(content.getBytes()).toString());
+            Writer w = rsrc.getWriter();
+            w.write(content);
+            w.close();
+            return rsrc;
         } catch (Exception e) {
             throw new RuntimeException(e);
-        } finally {
-            if (null != out) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    logger_.warn("cannot close output in minimizor", e);
-                }
-            }
         }
-
-        return rsrc;
     }
 
     private String minimize_(List<String> resourceNames) {
@@ -908,7 +904,7 @@ public class Minimizer implements IMinimizer {
         copy_(new StringReader(s), out);
     }
 
-    private IResource newCache_(List<String> resourceNames) {
+    private IResource newCache_(String resourceNames) {
         if (inMemory_) {
             return bl_.newBuffer(resourceNames, type_.getExtension());
         } else {
@@ -916,9 +912,9 @@ public class Minimizer implements IMinimizer {
         }
     }
 
-    private File newCacheFile_(List<String> resourceNames) {
+    private File newCacheFile_(String resourceName) {
         String extension = type_.getExtension();
-        return cache_.createTempFile(resourceNames, extension);
+        return cache_.createTempFile(resourceName, extension);
     }
 
     private void checkInitialize_(boolean initialized) {

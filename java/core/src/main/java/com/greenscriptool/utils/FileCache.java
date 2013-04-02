@@ -28,20 +28,14 @@ public class FileCache {
         return new File(r_, fn);
     }
 
-    public File createTempFile(List<String> resourceNames, String extension) {
+    public File createTempFile(String resourceName, String extension) {
         //try {
             if (!r_.isDirectory() && !r_.mkdir()) {
               throw new RuntimeException("cannot create temporary directory for: " + r_);
             }
 
-            StringBuilder builder = new StringBuilder();
-            for (String resourceName : resourceNames) {
-                builder.append(resourceName);
-            }
-
-            String key = UUID.nameUUIDFromBytes(builder.toString().getBytes()).toString() + extension;
             //return File.createTempFile("gstmp", extension, r_);
-            return new File(r_, key);
+            return new File(r_, resourceName);
 //        } catch (IOException e) {
 //            String msg = "Error create temp file";
 //            throw new RuntimeException(msg, e);
