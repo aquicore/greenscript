@@ -332,10 +332,12 @@ public class GreenScriptPlugin extends PlayPlugin {
             final long l = file.lastModified();
             final String etag = "\"" + l + "-" + file.hashCode() + "\"";
             Map<String, Http.Header> headers = request.headers;
-            if (headers.containsKey("if-none-match") && headers.containsKey("if-modified-since")) {
+            if (!request.isModified(etag, l)) {
                 if ("GET".equalsIgnoreCase(request.method)) {
                     response.status = Http.StatusCode.NOT_MODIFIED;
-                    response.cacheFor(etag, "100d", l);
+                    if (Play.mode == Mode.PROD) {
+                        response.cacheFor(etag, "100d", l);
+                    }
                     keepFlash_();
                     return true;
                 }
@@ -387,13 +389,6 @@ public class GreenScriptPlugin extends PlayPlugin {
     }
 
     private boolean processStatic_(VirtualFile file, Request req, Response resp, ResourceType type) {
-        /*
-        IRenderSession sess = type == ResourceType.JS ? jsSession() : cssSession();
-        if (null != sess && sess.hasDeclared()) {
-            // do not service static if requesting to minimized files
-            return false;
-        }
-        */
         if (Play.mode == Mode.PROD) {
             resp.cacheFor("1h");
         }
