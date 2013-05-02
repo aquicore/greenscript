@@ -73,7 +73,7 @@ public class Minimizer implements IMinimizer {
     }
 
     public Minimizer(ResourceType type) {
-        ICompressor compressor = type == ResourceType.CSS ? new YUICompressor(type) : new ClosureCompressor(type);
+        ICompressor compressor = type == ResourceType.CSS ? new YUICompressor(type) : new NOOPCompressor();
         init_(compressor, type);
     }
 

@@ -1,6 +1,12 @@
 package controllers.greenscript;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.UUID;
+import java.util.zip.GZIPOutputStream;
 
 import play.Play;
 import play.libs.Time;
@@ -31,13 +37,23 @@ public class Service extends Controller {
             return;
         }
 
+
+        final ByteArrayOutputStream gzip;
+        try {
+            gzip = getGzipStream(content);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        response.out = gzip;
+        response.setHeader("Content-Length", gzip.size() + "");
+        response.setHeader("Content-Encoding", "gzip");
+
         if (key.endsWith(".js")) {
             response.setContentTypeIfNotSet("text/javascript");
         } else if (key.endsWith(".css")) {
             response.setContentTypeIfNotSet("text/css");
         }
-        
-        renderText(content);
     }
 
 
@@ -58,6 +74,20 @@ public class Service extends Controller {
             String browserEtag = request.headers.get("if-none-match").value();
             return (!browserEtag.equals(etag));
         }
+    }
+
+    private static ByteArrayOutputStream getGzipStream(final String input) throws IOException {
+        final InputStream inputStream = new ByteArrayInputStream(input.getBytes());
+        final ByteArrayOutputStream stringOutputStream = new ByteArrayOutputStream(input.length());
+        final OutputStream gzipOutputStream = new GZIPOutputStream(stringOutputStream);
+        final byte[] buf = new byte[5000];
+        int len;
+        while ((len = inputStream.read(buf)) > 0) {
+            gzipOutputStream.write(buf, 0, len);
+        }
+        inputStream.close();
+        gzipOutputStream.close();
+        return stringOutputStream;
     }
 
 }
