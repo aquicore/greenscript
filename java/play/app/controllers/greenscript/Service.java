@@ -45,13 +45,13 @@ public class Service extends Controller {
      * Add cache-control headers
      * @param duration Ex: 3h
      */
-    public static void cacheFor(String etag, String duration) {
+    private static void cacheFor(String etag, String duration) {
         int maxAge = Time.parseDuration(duration);
         response.setHeader("Cache-Control", "max-age=" + maxAge);
         response.setHeader("Etag", etag);
     }
 
-    public static boolean isModified(String etag) {
+    private static boolean isModified(String etag) {
         if (!(request.headers.containsKey("if-none-match"))) {
             return true;
         } else {
