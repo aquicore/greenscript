@@ -3,6 +3,7 @@ package controllers.greenscript;
 import java.util.UUID;
 
 import play.Play;
+import play.libs.Time;
 import play.modules.greenscript.GreenScriptPlugin;
 import play.mvc.Controller;
 import play.mvc.Http;
@@ -20,13 +21,12 @@ public class Service extends Controller {
         } else {
             etag = UUID.nameUUIDFromBytes(content.getBytes()).toString();
         }
-        final long l = System.currentTimeMillis();
         if (Play.mode == Play.Mode.PROD)  {
-            response.cacheFor(etag, "100d", l);
+            cacheFor(etag, "100d");
         }
         Flash.current().keep();
 
-        if (!request.isModified(etag, l)) {
+        if (!isModified(etag)) {
             response.status = Http.StatusCode.NOT_MODIFIED;
             return;
         }
@@ -38,6 +38,26 @@ public class Service extends Controller {
         }
         
         renderText(content);
+    }
+
+
+    /**
+     * Add cache-control headers
+     * @param duration Ex: 3h
+     */
+    public static void cacheFor(String etag, String duration) {
+        int maxAge = Time.parseDuration(duration);
+        response.setHeader("Cache-Control", "max-age=" + maxAge);
+        response.setHeader("Etag", etag);
+    }
+
+    public static boolean isModified(String etag) {
+        if (!(request.headers.containsKey("if-none-match"))) {
+            return true;
+        } else {
+            String browserEtag = request.headers.get("if-none-match").value();
+            return (!browserEtag.equals(etag));
+        }
     }
 
 }
