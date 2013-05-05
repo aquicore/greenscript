@@ -34,6 +34,7 @@ public class Service extends Controller {
 
         if (!isModified(etag)) {
             response.status = Http.StatusCode.NOT_MODIFIED;
+            setContentType(key);
             return;
         }
 
@@ -49,6 +50,11 @@ public class Service extends Controller {
         response.setHeader("Content-Length", gzip.size() + "");
         response.setHeader("Content-Encoding", "gzip");
 
+        setContentType(key);
+    }
+
+
+    private static void setContentType(String key) {
         if (key.endsWith(".js")) {
             response.setContentTypeIfNotSet("text/javascript");
         } else if (key.endsWith(".css")) {
