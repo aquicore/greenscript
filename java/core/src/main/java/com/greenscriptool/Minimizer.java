@@ -68,8 +68,10 @@ public class Minimizer implements IMinimizer {
             throw new NullPointerException();
         compressor_ = compressor;
         type_ = type;
-        less_ = new LessEngine();
-        coffee_ = new JCoffeeScriptCompiler();
+        if (lessEnabled_())
+            less_ = new LessEngine();
+        if (coffeeEnabled_())
+            coffee_ = new JCoffeeScriptCompiler();
     }
 
     public Minimizer(ResourceType type) {
@@ -797,7 +799,7 @@ public class Minimizer implements IMinimizer {
                 logger_.warn("error compile less file: " + file.getName() + ", error: " + e.getMessage(), e);
             }
         } else {
-            if (file.getName().endsWith(".coffee")) {
+            if (coffeeEnabled_() && file.getName().endsWith(".coffee")) {
                 try {
                     s = coffee_.compile(fileToString_(file));
                 } catch (JCoffeeScriptCompileException e) {
